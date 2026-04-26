@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // ── Users ────────────────────────────────────────────────────────────
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
+
+      // Cart items subcollection
+      match /cartItems/{itemId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // Wishlist subcollection
+      match /wishlist/{productId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ── Products ─────────────────────────────────────────────────────────
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+
+      // Reviews subcollection (one review per user, keyed by uid)
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if isAuthenticated() && reviewId == request.auth.uid;
+        allow update, delete: if isAuthenticated() && reviewId == request.auth.uid;
+      }
+    }
+
+    // ── Orders ───────────────────────────────────────────────────────────
+    match /orders/{orderId} {
+      allow read: if isAuthenticated()
+        && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated()
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if isAdmin();
+    }
+  }
+}
