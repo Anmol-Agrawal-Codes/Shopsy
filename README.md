@@ -1,4 +1,4 @@
-# Shopsy Pro - Production-Ready Full-Stack E-Commerce (Firebase + React)
+# CommerceKit Pro - Production-Ready Full-Stack E-Commerce (Firebase + React)
 
 A full-stack e-commerce web application built with a JavaScript stack:
 

@@ -31,7 +31,7 @@ const AppHeader = () => {
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur dark:border-gray-700 dark:bg-gray-900/80">
       <div className="container flex h-14 items-center justify-between">
         <Link to="/" className="text-xl font-bold text-primary">
-          Shopsy
+          CommerceKit
         </Link>
 
         {/* Desktop nav */}
